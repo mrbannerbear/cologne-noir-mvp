@@ -12,6 +12,17 @@ interface ProductFormProps {
   onCancel?: () => void;
 }
 
+// Helper functions for notes conversion
+const notesArrayToString = (arr: string[] | null | undefined): string => {
+  if (!arr || arr.length === 0) return '';
+  return arr.join(', ');
+};
+
+const notesStringToArray = (str: string | undefined): string[] => {
+  if (!str || str.trim() === '') return [];
+  return str.split(',').map(s => s.trim()).filter(Boolean);
+};
+
 export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) {
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();
@@ -33,9 +44,9 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
           total_volume_ml: product.total_volume_ml,
           current_volume_ml: product.current_volume_ml,
           batch_code: product.batch_code || '',
-          top_notes: product.top_notes,
-          heart_notes: product.heart_notes,
-          base_notes: product.base_notes,
+          top_notes: notesArrayToString(product.top_notes),
+          heart_notes: notesArrayToString(product.heart_notes),
+          base_notes: notesArrayToString(product.base_notes),
           price_10ml: product.price_10ml || undefined,
           price_15ml: product.price_15ml || undefined,
           price_30ml: product.price_30ml || undefined,
@@ -48,18 +59,26 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
           gender: 'unisex',
           season: 'all',
           is_active: true,
-          top_notes: [],
-          heart_notes: [],
-          base_notes: [],
+          top_notes: '',
+          heart_notes: '',
+          base_notes: '',
         },
   });
 
   const onSubmit = async (data: ProductFormData) => {
     try {
+      // Convert comma-separated strings to arrays before saving
+      const processedData = {
+        ...data,
+        top_notes: notesStringToArray(data.top_notes),
+        heart_notes: notesStringToArray(data.heart_notes),
+        base_notes: notesStringToArray(data.base_notes),
+      };
+
       if (product) {
-        await updateProduct.mutateAsync({ id: product.id, data });
+        await updateProduct.mutateAsync({ id: product.id, data: processedData });
       } else {
-        await createProduct.mutateAsync(data);
+        await createProduct.mutateAsync(processedData);
       }
       onSuccess?.();
     } catch {
