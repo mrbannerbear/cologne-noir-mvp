@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { X, Menu, ShoppingBag, User } from 'lucide-react';
+import { X, Menu, ShoppingBag } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useCart } from '@/hooks/use-cart';
@@ -49,10 +49,10 @@ export function MobileNav() {
     window.location.href = '/';
   };
 
-  // Close menu when pathname changes
-  useEffect(() => {
+  // Close menu when navigating to a new page
+  const handleLinkClick = () => {
     setIsOpen(false);
-  }, [pathname]);
+  };
 
   return (
     <>
@@ -86,6 +86,7 @@ export function MobileNav() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
+                    onClick={handleLinkClick}
                     className={cn(
                       'block border-b border-foreground/20 px-4 py-3 text-sm font-medium uppercase tracking-wider',
                       pathname === item.href && 'bg-foreground text-background'
@@ -104,6 +105,7 @@ export function MobileNav() {
                     <li>
                       <Link
                         href="/admin"
+                        onClick={handleLinkClick}
                         className="block border-b border-foreground/20 px-4 py-3 text-sm font-medium uppercase tracking-wider"
                       >
                         Admin Panel
@@ -124,6 +126,7 @@ export function MobileNav() {
                   <li>
                     <Link
                       href="/login"
+                      onClick={handleLinkClick}
                       className="block border-b border-foreground/20 px-4 py-3 text-sm font-medium uppercase tracking-wider"
                     >
                       Sign In
@@ -132,6 +135,7 @@ export function MobileNav() {
                   <li>
                     <Link
                       href="/register"
+                      onClick={handleLinkClick}
                       className="block px-4 py-3 text-sm font-medium uppercase tracking-wider"
                     >
                       Register

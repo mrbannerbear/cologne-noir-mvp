@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { StockHealthTable } from '@/components/admin/stock-health-table';
 import { VolumeAdjustmentForm } from '@/components/admin/volume-adjustment-form';
 import { GSAPModal } from '@/components/shared/gsap-modal';
 import { LoadingPage } from '@/components/shared/loading-spinner';

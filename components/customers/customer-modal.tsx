@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Pencil } from 'lucide-react';
 import { GSAPModal } from '@/components/shared/gsap-modal';
 import { CustomerForm } from './customer-form';
@@ -18,23 +18,35 @@ export function CustomerModal({ customer, isOpen, onClose }: CustomerModalProps)
   const [isEditing, setIsEditing] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoadingOrders, setIsLoadingOrders] = useState(false);
+  const [loadedCustomerId, setLoadedCustomerId] = useState<string | null>(null);
   const supabase = createClient();
 
-  useEffect(() => {
-    if (customer && isOpen) {
-      setIsLoadingOrders(true);
-      supabase
-        .from('orders')
-        .select('*')
-        .eq('user_id', customer.id)
-        .order('created_at', { ascending: false })
-        .limit(10)
-        .then(({ data }) => {
-          setOrders(data || []);
-          setIsLoadingOrders(false);
-        });
-    }
-  }, [customer, isOpen, supabase]);
+  // Load orders when customer changes and modal is open
+  const loadOrders = async () => {
+    if (!customer || loadedCustomerId === customer.id) return;
+    
+    setIsLoadingOrders(true);
+    const { data } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('user_id', customer.id)
+      .order('created_at', { ascending: false })
+      .limit(10);
+    setOrders(data || []);
+    setIsLoadingOrders(false);
+    setLoadedCustomerId(customer.id);
+  };
+
+  // Trigger load when modal opens
+  if (customer && isOpen && loadedCustomerId !== customer.id) {
+    loadOrders();
+  }
+
+  // Reset state when modal closes
+  const handleClose = () => {
+    setLoadedCustomerId(null);
+    onClose();
+  };
 
   if (!customer) return null;
 
@@ -43,7 +55,7 @@ export function CustomerModal({ customer, isOpen, onClose }: CustomerModalProps)
   return (
     <GSAPModal
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleClose}
       title={isEditing ? 'Edit Customer' : customer.full_name || 'Customer Details'}
       size="lg"
     >

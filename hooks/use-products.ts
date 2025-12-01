@@ -84,7 +84,8 @@ export function useCreateProduct() {
 
   return useMutation({
     mutationFn: async (productData: ProductFormData) => {
-      const { data, error } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase as any)
         .from('products')
         .insert([productData])
         .select()
@@ -112,7 +113,8 @@ export function useUpdateProduct() {
       id: string;
       data: Partial<ProductFormData>;
     }) => {
-      const { data, error } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase as any)
         .from('products')
         .update(productData)
         .eq('id', id)
@@ -159,7 +161,8 @@ export function useBrands() {
         .eq('is_active', true);
 
       if (error) throw error;
-      const brands = [...new Set(data.map((p) => p.brand))].sort();
+      const products = data as unknown as { brand: string }[];
+      const brands = [...new Set(products.map((p) => p.brand))].sort();
       return brands;
     },
   });

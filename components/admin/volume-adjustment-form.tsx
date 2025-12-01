@@ -42,8 +42,8 @@ export function VolumeAdjustmentForm({
     },
   });
 
-  const newVolume = watch('new_volume');
-  const adjustment = newVolume - product.current_volume_ml;
+  const newVolume = watch('new_volume') || 0;
+  const adjustment = Number(newVolume) - product.current_volume_ml;
 
   const onSubmit = async (data: VolumeAdjustmentFormData) => {
     setError(null);
@@ -58,7 +58,8 @@ export function VolumeAdjustmentForm({
         return;
       }
 
-      const { data: result, error: rpcError } = await supabase.rpc(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: result, error: rpcError } = await (supabase as any).rpc(
         'adjust_product_volume',
         {
           p_product_id: data.product_id,
@@ -70,7 +71,7 @@ export function VolumeAdjustmentForm({
       );
 
       if (rpcError) throw rpcError;
-      if (!result.success) throw new Error(result.error);
+      if (!result?.success) throw new Error(result?.error || 'Unknown error');
 
       // Invalidate queries
       queryClient.invalidateQueries({ queryKey: ['products'] });
@@ -104,7 +105,7 @@ export function VolumeAdjustmentForm({
       <div>
         <label className={labelClass}>New Volume (ml) *</label>
         <input
-          {...register('new_volume')}
+          {...register('new_volume', { valueAsNumber: true })}
           type="number"
           step="0.01"
           min="0"

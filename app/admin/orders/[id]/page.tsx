@@ -11,7 +11,7 @@ import {
   useUpdatePaymentStatus,
   useProcessOrder,
 } from '@/hooks/use-orders';
-import { cn, formatCurrency, formatDate, formatDateTime, formatOrderId } from '@/lib/utils';
+import { cn, formatCurrency, formatDateTime, formatOrderId } from '@/lib/utils';
 import {
   ORDER_STATUS_LABELS,
   PAYMENT_STATUS_LABELS,

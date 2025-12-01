@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { createClient } from '@/lib/supabase/client';
-import type { Order, OrderWithItems, OrderItem } from '@/types';
+import type { Order, OrderWithItems, OrderItem, Profile } from '@/types';
 import type { CheckoutFormData, OrderStatusUpdateData, PaymentStatusUpdateData } from '@/lib/validations/order';
 import { useCart } from './use-cart';
 
@@ -67,7 +67,7 @@ export function useOrder(id: string) {
 
       if (itemsError) throw itemsError;
 
-      return { ...order, items } as OrderWithItems;
+      return { ...(order as unknown as Order), items: items as unknown as OrderItem[] } as OrderWithItems;
     },
     enabled: !!id,
   });
@@ -78,13 +78,15 @@ export function useAdminOrder(id: string) {
   return useQuery({
     queryKey: ['admin-order', id],
     queryFn: async () => {
-      const { data: order, error: orderError } = await supabase
+      const { data: orderData, error: orderError } = await supabase
         .from('orders')
         .select('*')
         .eq('id', id)
         .single();
 
       if (orderError) throw orderError;
+      
+      const order = orderData as unknown as Order;
 
       const { data: items, error: itemsError } = await supabase
         .from('order_items')
@@ -99,7 +101,11 @@ export function useAdminOrder(id: string) {
         .eq('id', order.user_id)
         .single();
 
-      return { ...order, items, profile } as OrderWithItems;
+      return { 
+        ...order, 
+        items: items as unknown as OrderItem[], 
+        profile: profile as unknown as Profile | undefined 
+      } as OrderWithItems;
     },
     enabled: !!id,
   });
@@ -119,7 +125,8 @@ export function useCreateOrder() {
       if (!user) throw new Error('Not authenticated');
 
       // Create order
-      const { data: order, error: orderError } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: order, error: orderError } = await (supabase as any)
         .from('orders')
         .insert([
           {
@@ -154,7 +161,8 @@ export function useCreateOrder() {
         })
       );
 
-      const { error: itemsError } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error: itemsError } = await (supabase as any)
         .from('order_items')
         .insert(orderItems);
 
@@ -197,7 +205,8 @@ export function useUpdateOrderStatus() {
         updates.delivered_at = new Date().toISOString();
       }
 
-      const { data: order, error } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: order, error } = await (supabase as any)
         .from('orders')
         .update(updates)
         .eq('id', id)
@@ -242,12 +251,14 @@ export function useUpdatePaymentStatus() {
           .eq('id', id)
           .single();
 
-        if (currentOrder?.status === 'pending_payment') {
+        const orderData = currentOrder as unknown as { status: string } | null;
+        if (orderData?.status === 'pending_payment') {
           updates.status = 'new';
         }
       }
 
-      const { data: order, error } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: order, error } = await (supabase as any)
         .from('orders')
         .update(updates)
         .eq('id', id)
@@ -278,13 +289,14 @@ export function useProcessOrder() {
 
       if (!user) throw new Error('Not authenticated');
 
-      const { data, error } = await supabase.rpc('process_decant_order', {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase as any).rpc('process_decant_order', {
         p_order_id: orderId,
         p_admin_id: user.id,
       });
 
       if (error) throw error;
-      if (!data.success) throw new Error(data.error);
+      if (!data?.success) throw new Error(data?.error || 'Unknown error');
 
       return data;
     },

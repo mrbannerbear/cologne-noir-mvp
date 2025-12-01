@@ -13,9 +13,7 @@ export const checkoutSchema = z.object({
   email: z.string().email('Invalid email address'),
   phone: z.string().regex(/^[+]?[\d\s-]{10,15}$/, 'Invalid phone number'),
   shippingAddress: shippingAddressSchema,
-  paymentMethod: z.enum(['cod', 'bkash'], {
-    required_error: 'Payment method is required',
-  }),
+  paymentMethod: z.enum(['cod', 'bkash']),
   bkashTransactionId: z.string().optional(),
   notes: z.string().max(500, 'Notes too long').optional(),
 }).refine(

@@ -23,17 +23,26 @@ export default function AdminSuppliesPage() {
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    fetchSupplies();
-  }, []);
+    const fetchSupplies = async () => {
+      const { data } = await supabase
+        .from('supplies')
+        .select('*')
+        .order('item_name', { ascending: true });
 
-  const fetchSupplies = async () => {
+      setSupplies(data || []);
+      setIsLoading(false);
+    };
+    
+    fetchSupplies();
+  }, [supabase]);
+
+  const refetchSupplies = async () => {
     const { data } = await supabase
       .from('supplies')
       .select('*')
       .order('item_name', { ascending: true });
 
     setSupplies(data || []);
-    setIsLoading(false);
   };
 
   const resetForm = () => {
@@ -57,7 +66,7 @@ export default function AdminSuppliesPage() {
     e.preventDefault();
     setIsSaving(true);
 
-    const data = {
+    const supplyData = {
       item_name: itemName,
       size_value: sizeValue ? parseFloat(sizeValue) : null,
       stock_count: parseInt(stockCount),
@@ -65,12 +74,14 @@ export default function AdminSuppliesPage() {
     };
 
     if (editingSupply) {
-      await supabase.from('supplies').update(data).eq('id', editingSupply.id);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase.from('supplies') as any).update(supplyData).eq('id', editingSupply.id);
     } else {
-      await supabase.from('supplies').insert([data]);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase.from('supplies') as any).insert(supplyData);
     }
 
-    await fetchSupplies();
+    await refetchSupplies();
     setShowAddModal(false);
     resetForm();
     setIsSaving(false);
@@ -79,7 +90,7 @@ export default function AdminSuppliesPage() {
   const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this supply item?')) {
       await supabase.from('supplies').delete().eq('id', id);
-      await fetchSupplies();
+      await refetchSupplies();
     }
   };
 

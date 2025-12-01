@@ -2,6 +2,8 @@ import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { CartProvider } from '@/components/cart/cart-provider';
 
+export const dynamic = 'force-dynamic';
+
 export default function CustomerLayout({
   children,
 }: {

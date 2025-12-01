@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { Minus, Plus, X } from 'lucide-react';
-import { cn, formatCurrency } from '@/lib/utils';
+import { formatCurrency } from '@/lib/utils';
 import { useCart } from '@/hooks/use-cart';
 import type { CartItem as CartItemType, SizeOption } from '@/types';
 

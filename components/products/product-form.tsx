@@ -143,7 +143,7 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
         <div>
           <label className={labelClass}>Total Volume (ml) *</label>
           <input
-            {...register('total_volume_ml')}
+            {...register('total_volume_ml', { valueAsNumber: true })}
             type="number"
             step="0.01"
             className={inputClass}
@@ -156,7 +156,7 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
         <div>
           <label className={labelClass}>Current Volume (ml) *</label>
           <input
-            {...register('current_volume_ml')}
+            {...register('current_volume_ml', { valueAsNumber: true })}
             type="number"
             step="0.01"
             className={inputClass}
@@ -186,7 +186,7 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
           <div>
             <label className="text-xs text-muted-foreground">10ml</label>
             <input
-              {...register('price_10ml')}
+              {...register('price_10ml', { valueAsNumber: true })}
               type="number"
               step="0.01"
               className={inputClass}
@@ -196,7 +196,7 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
           <div>
             <label className="text-xs text-muted-foreground">15ml</label>
             <input
-              {...register('price_15ml')}
+              {...register('price_15ml', { valueAsNumber: true })}
               type="number"
               step="0.01"
               className={inputClass}
@@ -206,7 +206,7 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
           <div>
             <label className="text-xs text-muted-foreground">30ml</label>
             <input
-              {...register('price_30ml')}
+              {...register('price_30ml', { valueAsNumber: true })}
               type="number"
               step="0.01"
               className={inputClass}
@@ -216,7 +216,7 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
           <div>
             <label className="text-xs text-muted-foreground">100ml</label>
             <input
-              {...register('price_100ml')}
+              {...register('price_100ml', { valueAsNumber: true })}
               type="number"
               step="0.01"
               className={inputClass}

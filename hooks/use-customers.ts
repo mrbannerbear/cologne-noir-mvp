@@ -19,7 +19,7 @@ export function useCustomers() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data as Profile[];
+      return data as unknown as Profile[];
     },
   });
 }
@@ -30,13 +30,15 @@ export function useCustomersWithStats() {
     queryKey: ['customers-with-stats'],
     queryFn: async () => {
       // Fetch profiles
-      const { data: profiles, error: profilesError } = await supabase
+      const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
         .eq('role', 'customer')
         .order('created_at', { ascending: false });
 
       if (profilesError) throw profilesError;
+      
+      const profiles = profilesData as unknown as Profile[];
 
       // Fetch order stats for each customer
       const customersWithStats: CustomerWithStats[] = await Promise.all(
@@ -47,11 +49,12 @@ export function useCustomersWithStats() {
             .eq('user_id', profile.id)
             .eq('payment_status', 'paid');
 
-          const totalSpent = orders?.reduce((sum, o) => sum + Number(o.total), 0) || 0;
-          const orderCount = orders?.length || 0;
+          const ordersList = orders as unknown as { total: number; created_at: string }[] | null;
+          const totalSpent = ordersList?.reduce((sum, o) => sum + Number(o.total), 0) || 0;
+          const orderCount = ordersList?.length || 0;
           const lastOrderDate =
-            orders && orders.length > 0
-              ? orders.sort(
+            ordersList && ordersList.length > 0
+              ? ordersList.sort(
                   (a, b) =>
                     new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
                 )[0].created_at
@@ -83,7 +86,7 @@ export function useCustomer(id: string) {
         .single();
 
       if (error) throw error;
-      return data as Profile;
+      return data as unknown as Profile;
     },
     enabled: !!id,
   });
@@ -124,7 +127,8 @@ export function useUpdateCustomer() {
       id: string;
       data: CustomerUpdateFormData;
     }) => {
-      const { data, error } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase as any)
         .from('profiles')
         .update(customerData)
         .eq('id', id)
@@ -155,7 +159,8 @@ export function useUpdateProfile() {
 
       if (!user) throw new Error('Not authenticated');
 
-      const { data, error } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase as any)
         .from('profiles')
         .update(profileData)
         .eq('id', user.id)

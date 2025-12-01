@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Filter, X } from 'lucide-react';
+import { Filter } from 'lucide-react';
 import { ProductGrid } from '@/components/products/product-grid';
 import { LoadingPage } from '@/components/shared/loading-spinner';
 import { useProducts, useBrands } from '@/hooks/use-products';

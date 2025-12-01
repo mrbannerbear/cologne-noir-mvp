@@ -20,8 +20,9 @@ export function useRealtimeStock(productId?: string) {
         .eq('id', productId)
         .single();
 
-      if (data) {
-        setStock(data.current_volume_ml);
+      const productData = data as unknown as { current_volume_ml: number } | null;
+      if (productData) {
+        setStock(productData.current_volume_ml);
       }
     };
 
@@ -66,7 +67,7 @@ export function useRealtimeLowStock() {
         .eq('is_active', true);
 
       if (data) {
-        setLowStockProducts(data);
+        setLowStockProducts(data as unknown as Product[]);
       }
     };
 

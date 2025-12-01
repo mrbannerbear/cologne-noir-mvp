@@ -10,7 +10,8 @@ export function useAdminStats() {
   return useQuery({
     queryKey: ['admin-stats'],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc('get_admin_stats');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase as any).rpc('get_admin_stats');
 
       if (error) throw error;
       return data as AdminStats;
@@ -23,7 +24,8 @@ export function useLowStockProducts(threshold = 10) {
   return useQuery({
     queryKey: ['low-stock-products', threshold],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc('get_low_stock_products', {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase as any).rpc('get_low_stock_products', {
         p_threshold: threshold,
       });
 

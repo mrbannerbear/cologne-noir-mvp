@@ -13,7 +13,6 @@ import { useCart } from '@/hooks/use-cart';
 import { useCreateOrder } from '@/hooks/use-orders';
 import { useProfile } from '@/hooks/use-customers';
 import { createClient } from '@/lib/supabase/client';
-import type { PaymentMethod } from '@/types';
 
 export default function CheckoutPage() {
   const router = useRouter();

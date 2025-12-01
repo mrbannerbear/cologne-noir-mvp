@@ -6,7 +6,8 @@ export const profileSchema = z.object({
     .string()
     .regex(/^[+]?[\d\s-]{10,15}$/, 'Invalid phone number')
     .nullable()
-    .optional(),
+    .optional()
+    .or(z.literal('')),
   shipping_address: z.object({
     street: z.string().max(200, 'Street address too long').optional(),
     city: z.string().max(100, 'City name too long').optional(),
@@ -14,8 +15,8 @@ export const profileSchema = z.object({
     postal_code: z.string().max(20, 'Postal code too long').optional(),
     country: z.string().max(100, 'Country name too long').optional(),
   }).optional(),
-  favorite_brands: z.array(z.string()).default([]),
-  favorite_scents: z.array(z.string()).default([]),
+  favorite_brands: z.array(z.string()),
+  favorite_scents: z.array(z.string()),
 });
 
 export type ProfileFormData = z.infer<typeof profileSchema>;
