@@ -1,13 +1,17 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
+import { Plus } from 'lucide-react';
 import { LoadingPage } from '@/components/shared/loading-spinner';
+import { CreateOrderModal } from '@/components/admin/create-order-modal';
 import { useAdminOrders } from '@/hooks/use-orders';
 import { cn, formatCurrency, formatDate, formatOrderId } from '@/lib/utils';
 import { ORDER_STATUS_LABELS, PAYMENT_STATUS_LABELS, PAYMENT_METHOD_LABELS } from '@/lib/constants';
 
 export default function AdminOrdersPage() {
-  const { data: orders, isLoading } = useAdminOrders();
+  const { data: orders, isLoading, refetch } = useAdminOrders();
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   if (isLoading) {
     return <LoadingPage />;
@@ -16,13 +20,22 @@ export default function AdminOrdersPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="font-serif text-3xl font-bold uppercase tracking-wider">
-          Orders
-        </h1>
-        <p className="mt-2 text-muted-foreground">
-          Manage customer orders and fulfillment
-        </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="font-serif text-3xl font-bold uppercase tracking-wider">
+            Orders
+          </h1>
+          <p className="mt-2 text-muted-foreground">
+            Manage customer orders and fulfillment
+          </p>
+        </div>
+        <button
+          onClick={() => setIsCreateModalOpen(true)}
+          className="flex items-center gap-2 border-2 border-foreground bg-foreground px-4 py-2 text-sm font-medium uppercase tracking-wider text-background transition-colors hover:bg-transparent hover:text-foreground"
+        >
+          <Plus className="h-4 w-4" />
+          New Order
+        </button>
       </div>
 
       {/* Orders Table */}
@@ -112,6 +125,13 @@ export default function AdminOrdersPage() {
           </table>
         </div>
       )}
+
+      {/* Create Order Modal */}
+      <CreateOrderModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={() => refetch()}
+      />
     </div>
   );
 }

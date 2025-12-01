@@ -1,18 +1,21 @@
 'use client';
 
 import { useState } from 'react';
+import { Plus } from 'lucide-react';
 import { CustomerTable } from '@/components/customers/customer-table';
 import { CustomerModal } from '@/components/customers/customer-modal';
+import { CreateCustomerModal } from '@/components/admin/create-customer-modal';
 import { LoadingPage } from '@/components/shared/loading-spinner';
 import { useCustomersWithStats } from '@/hooks/use-customers';
 import { formatCurrency } from '@/lib/utils';
 import type { CustomerWithStats } from '@/types';
 
 export default function AdminCustomersPage() {
-  const { data: customers, isLoading } = useCustomersWithStats();
+  const { data: customers, isLoading, refetch } = useCustomersWithStats();
   const [selectedCustomer, setSelectedCustomer] = useState<CustomerWithStats | null>(
     null
   );
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   if (isLoading) {
     return <LoadingPage />;
@@ -26,13 +29,22 @@ export default function AdminCustomersPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="font-serif text-3xl font-bold uppercase tracking-wider">
-          Customers
-        </h1>
-        <p className="mt-2 text-muted-foreground">
-          View and manage your customer base
-        </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="font-serif text-3xl font-bold uppercase tracking-wider">
+            Customers
+          </h1>
+          <p className="mt-2 text-muted-foreground">
+            View and manage your customer base
+          </p>
+        </div>
+        <button
+          onClick={() => setIsCreateModalOpen(true)}
+          className="flex items-center gap-2 border-2 border-foreground bg-foreground px-4 py-2 text-sm font-medium uppercase tracking-wider text-background transition-colors hover:bg-transparent hover:text-foreground"
+        >
+          <Plus className="h-4 w-4" />
+          New Customer
+        </button>
       </div>
 
       {/* Stats */}
@@ -72,6 +84,13 @@ export default function AdminCustomersPage() {
         customer={selectedCustomer}
         isOpen={!!selectedCustomer}
         onClose={() => setSelectedCustomer(null)}
+      />
+
+      {/* Create Customer Modal */}
+      <CreateCustomerModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={() => refetch()}
       />
     </div>
   );

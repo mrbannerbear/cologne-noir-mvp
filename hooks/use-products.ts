@@ -83,7 +83,7 @@ export function useCreateProduct() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (productData: ProductFormData) => {
+    mutationFn: async (productData: ProductFormData | Record<string, unknown>) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error } = await (supabase as any)
         .from('products')
@@ -111,7 +111,7 @@ export function useUpdateProduct() {
       data: productData,
     }: {
       id: string;
-      data: Partial<ProductFormData>;
+      data: Partial<ProductFormData> | Record<string, unknown>;
     }) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error } = await (supabase as any)
