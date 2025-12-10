@@ -25,13 +25,19 @@ export function MobileNav() {
 
   useEffect(() => {
     const fetchUserProfile = async (userId: string) => {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
+      try {
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .single();
 
-      setUser(profile);
+        if (error) throw error;
+        setUser(profile);
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+        setUser(null);
+      }
     };
 
     const getUser = async () => {
