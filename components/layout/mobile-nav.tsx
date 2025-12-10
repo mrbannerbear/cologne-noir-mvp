@@ -24,19 +24,23 @@ export function MobileNav() {
   const supabase = createClient();
 
   useEffect(() => {
+    const fetchUserProfile = async (userId: string) => {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      setUser(profile);
+    };
+
     const getUser = async () => {
       const {
         data: { user: authUser },
       } = await supabase.auth.getUser();
 
       if (authUser) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', authUser.id)
-          .single();
-
-        setUser(profile);
+        await fetchUserProfile(authUser.id);
       } else {
         setUser(null);
       }
@@ -48,13 +52,7 @@ export function MobileNav() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_, session) => {
       if (session?.user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
-
-        setUser(profile);
+        await fetchUserProfile(session.user.id);
       } else {
         setUser(null);
       }
