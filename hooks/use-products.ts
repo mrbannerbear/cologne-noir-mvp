@@ -87,7 +87,7 @@ export function useCreateProduct() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error } = await (supabase as any)
         .from('products')
-        .insert([productData])
+        .insert(productData)
         .select()
         .single();
 
