@@ -35,6 +35,8 @@ export function Header() {
           .single();
 
         setUser(profile);
+      } else {
+        setUser(null);
       }
     };
 
@@ -57,7 +59,7 @@ export function Header() {
     });
 
     return () => subscription.unsubscribe();
-  }, [supabase]);
+  }, []);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
