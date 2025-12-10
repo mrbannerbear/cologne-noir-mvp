@@ -22,19 +22,31 @@ export function Header() {
   const supabase = createClient();
 
   useEffect(() => {
+    const fetchUserProfile = async (userId: string) => {
+      try {
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .single();
+
+        if (error) throw error;
+        setUser(profile);
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+        setUser(null);
+      }
+    };
+
     const getUser = async () => {
       const {
         data: { user: authUser },
       } = await supabase.auth.getUser();
 
       if (authUser) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', authUser.id)
-          .single();
-
-        setUser(profile);
+        await fetchUserProfile(authUser.id);
+      } else {
+        setUser(null);
       }
     };
 
@@ -44,20 +56,14 @@ export function Header() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_, session) => {
       if (session?.user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
-
-        setUser(profile);
+        await fetchUserProfile(session.user.id);
       } else {
         setUser(null);
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [supabase]);
+  }, []);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
